@@ -13,6 +13,23 @@
 
 基于 Go-Kratos 框架构建的演示项目
 
+## Wire 工作区演示
+
+此分叉演示 [kratos-wire](https://github.com/yylego/kratos-wire)，当前正式版为 v0.0.0。`wirekratos --framework=kratos` 自动定位 `cmd/<项目名>/wire_gen.go`，移除生成的 `go:generate` 指令中的 `-mod=mod`，解决该参数在 Go 工作区模式下导致的执行失败。服务行为保持基线语义；[changes/demo1.md](changes/demo1.md) 和 [changes/demo2.md](changes/demo2.md) 展示接入差异。
+
+安装 Go 1.27，并将 Go 的二进制目录加入 `PATH`。从仓库根目录执行以下命令；已有 `go.work` 时，用 `go work use` 加入这些模块，不要重复初始化：
+
+```bash
+go install github.com/yylego/kratos-wire/cmd/wirekratos@v0.0.0
+go work init . ./demo1kratos ./demo2kratos
+make -C demo1kratos generate
+make -C demo2kratos generate
+```
+
+各服务模块的 `generate` 目标先准备 Wire 命令依赖，在 `go generate` 前执行一次 `wirekratos`，生成后再执行一次。因为 Google Wire 每次生成都会重新写入 `-mod=mod`，第二次修复保证最终产物仍兼容工作区。完整流程请在服务模块内执行 `make generate`；单独执行 `go generate` 不包含最后的修复。根目录的 `make generate` 则用于重生成 `changes/`。
+
+两个命令均应在工作区模式下成功，各自 `cmd/*/wire_gen.go` 第三行应为 `//go:generate go run github.com/google/wire/cmd/wire`。重复执行，生成文件应无变化。代码生成无需启动数据库；依赖注入后的服务构建和运行方式见后文。
+
 ---
 
 <!-- TEMPLATE (ZH) BEGIN: LANGUAGE NAVIGATION -->

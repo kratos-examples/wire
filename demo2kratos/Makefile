@@ -31,6 +31,7 @@ generate:
 	go get github.com/google/wire/cmd/wire@latest
 	wirekratos --framework=kratos
 	go generate ./...
+	wirekratos --framework=kratos
 	go mod tidy
 
 .PHONY: all

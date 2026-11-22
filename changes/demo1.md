@@ -2,7 +2,7 @@
 
 Code differences compared to source project.
 
-## Makefile (+4 -0)
+## Makefile (+5 -0)
 
 ```diff
 @@ -7,6 +7,7 @@
@@ -13,7 +13,7 @@ Code differences compared to source project.
  
  .PHONY: config
  # generate internal proto
-@@ -26,6 +27,9 @@
+@@ -26,7 +27,11 @@
  .PHONY: generate
  # generate
  generate:
@@ -21,8 +21,10 @@ Code differences compared to source project.
 +	go get github.com/google/wire/cmd/wire@latest
 +	wirekratos --framework=kratos
  	go generate ./...
++	wirekratos --framework=kratos
  	go mod tidy
  
+ .PHONY: all
 ```
 
 ## cmd/demo1kratos/wire_gen.go (+1 -1)

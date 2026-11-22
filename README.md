@@ -13,6 +13,23 @@
 
 Demo projects built with the Go-Kratos framework.
 
+## Wire workspace demo
+
+This fork demonstrates [kratos-wire](https://github.com/yylego/kratos-wire), whose current release is v0.0.0. Its `wirekratos --framework=kratos` command finds `cmd/<project>/wire_gen.go` and removes `-mod=mod` from the generated `go:generate` directive, which otherwise fails in Go workspace mode. The service behavior stays aligned with the baseline; [changes/demo1.md](changes/demo1.md) and [changes/demo2.md](changes/demo2.md) show the integration.
+
+With Go 1.27 installed and the Go binary directory on `PATH`, run from the repository root. If a `go.work` already exists, add these modules with `go work use` instead of initializing another workspace:
+
+```bash
+go install github.com/yylego/kratos-wire/cmd/wirekratos@v0.0.0
+go work init . ./demo1kratos ./demo2kratos
+make -C demo1kratos generate
+make -C demo2kratos generate
+```
+
+Each module's `generate` target prepares Wire's command dependencies, runs `wirekratos` before `go generate`, then runs it again after generation: Google Wire emits `-mod=mod` each time it runs. The second pass keeps the generated directive workspace-compatible. Use `make generate` inside a service module for the complete flow; plain `go generate` alone does not perform the final fix. The root `make generate` regenerates `changes/` instead.
+
+Both commands should succeed in workspace mode, and line 3 of each `cmd/*/wire_gen.go` should be `//go:generate go run github.com/google/wire/cmd/wire`. Repeat both commands: the generated files should remain unchanged. No running database is needed for generation; use the service instructions below to build and run the injected applications.
+
 ---
 
 <!-- TEMPLATE (EN) BEGIN: LANGUAGE NAVIGATION -->
